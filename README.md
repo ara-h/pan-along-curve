@@ -1,3 +1,6 @@
+# Pan Along Curve
+A web app that binaurally pans audio, following a time-paramaterized curve on the unit sphere.
+---
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
