@@ -25,6 +25,7 @@ class CurveSelector extends React.Component {
             type="radio"
             value={kv[0]}
             checked={this.state.selectedOption === kv[0]}
+            onChange={this.handleChange}
           />
           {kv[1].eqstring}
         </label><br />
@@ -32,7 +33,7 @@ class CurveSelector extends React.Component {
     );
 
     return(
-      <div onChange={this.handleChange}>
+      <div>
         {listItems}
       </div>
     );

@@ -9,14 +9,14 @@ import "./App.css"
 
 export default function App() {
   const animate = useRef(true);
-  const curveSelection = 'f1';
+  const [curveSelection, setCurveSelection] = useState('f1');
 
   return(
     <div className="App">
       <div className="curve-viewer">
         <Viewer animate={animate} whichCurve={curveSelection} />
         <div className="curve-selection">
-          <CurveSelector onSelectionChange={(s) => { curveSelection = s; }}
+          <CurveSelector onSelectionChange={(s) => { setCurveSelection(s); }}
             whichCurve={curveSelection} />
         </div>
       </div>
