@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 
 import Viewer from "./components/Viewer"
 import CurveSelector from "./components/curveSelector"
+import PlaySine from "./components/playSine"
 
 import "./App.css"
 
@@ -13,20 +14,16 @@ export default function App() {
 
   return(
     <div className="App">
-      <div className="curve-viewer">
-        <Viewer animate={animate} whichCurve={curveSelection} />
-        <div className="curve-selection">
-          <CurveSelector onSelectionChange={(s) => { setCurveSelection(s); }}
-            whichCurve={curveSelection} />
+      <Viewer animate={animate} whichCurve={curveSelection} />
+      <div className="control-panel">
+        <CurveSelector onSelectionChange={(s) => { setCurveSelection(s); }}
+          whichCurve={curveSelection} />
+        <div className="button-panel">
+          <button onClick={() => { animate.current = !animate.current; }}>
+            Pause/Resume
+          </button>
+          <PlaySine />
         </div>
-      </div>
-      <div className="controls">
-        <button onClick={() => { animate.current = !animate.current; }}>
-          Pause/Resume
-        </button>
-      </div>
-      <div className="patch-selection">
-        <p>Patch selector</p>
       </div>
     </div>
   );
