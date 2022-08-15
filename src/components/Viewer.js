@@ -1,79 +1,55 @@
-import * as THREE from "three";
-import { Component, useEffect, useRef, useState } from "react";
+//import * as THREE from "three";
+import { Component, useRef } from "react";
 import { Canvas, useFrame } from "react-three-fiber";
-// import { Text } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { curves } from "./Curves";
 
 import "./Viewer.css";
 
 
-function AudioAndAnimation(props) {
-  const sound = useRef();
+function Animation({ animate, f, sound }) {
   const emitterMesh = useRef();
   const receiverMesh = useRef();
 
-  const [listener] = useState(() => new THREE.AudioListener());
-
-  const audioCtx = listener.context;
-  const oscillator = audioCtx.createOscillator();
-  oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(220, audioCtx.currentTime);
-
-
-  useEffect(() => {
-    const receiver = receiverMesh.current;
-    receiver.add(listener);
-
-    sound.current.setNodeSource(oscillator);
-    oscillator.start();
-    console.log("oscillator started");
-
-    return () => {
-      receiver.remove(listener);
-      oscillator.stop();
-     }
-  }, [listener,oscillator])
-
-  let p;
+  let px, py, pz;
   let a = 0.0;
 
   useFrame((state, delta, xrFrame) => {
-    if (props.animate.current) {
+    if (animate.current) {
       a += delta;
 
-      p = props.f(a);
-      emitterMesh.current.position.x = p[0];
-      emitterMesh.current.position.y = p[1];
-      emitterMesh.current.position.z = p[2];
+      [px, py, pz] = f(a);
+      emitterMesh.current.position.x = px;
+      emitterMesh.current.position.y = py;
+      emitterMesh.current.position.z = pz;
+
+      sound.setPanPosition(px, py, pz);
     }
   })
 
   return(
     <>
-    <mesh ref={emitterMesh}>
-      <sphereBufferGeometry args={[0.1,16,16]} />
-      <meshStandardMaterial color="blue"  />
-      <positionalAudio ref={sound} args={[listener]} />
-    </mesh>
     <mesh
       ref={receiverMesh}
       position={[0, 0, 0]}
     />
+    <mesh ref={emitterMesh}>
+      <sphereBufferGeometry args={[0.1,16,16]} />
+      <meshStandardMaterial color="blue"  />
+    </mesh>
     <mesh>
-      <sphereBufferGeometry args={[0.995,16,16]} />
-      <meshStandardMaterial transparent opacity={0.4} color="red" />
+      <sphereBufferGeometry args={[0.85,16,16]} />
+      <meshStandardMaterial color="red" />
     </mesh>
     </>
   )
 }
 
 
-
 class Viewer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      animate: props.animate,
       whichCurve: props.whichCurve,
       curveFun: (curves.get(this.props.whichCurve)).fun
     }
@@ -81,7 +57,7 @@ class Viewer extends Component {
 
   componentDidUpdate(prevState) {
     if (this.props.whichCurve !== prevState.whichCurve) {
-      this.setState({ whichCurve : (curves.get(this.props.whichCurve)).fun });
+      this.setState({ curveFun : (curves.get(this.props.whichCurve)).fun });
     }
   }
 
@@ -90,10 +66,15 @@ class Viewer extends Component {
     return (
       <div className="Viewer">
         <Canvas>
-          <AudioAndAnimation
-            f={this.state.curveFun}
-            animate={this.state.animate}
-          />
+          <ambientLight />
+          <pointLight position={[0,2,0]} />
+            <Animation
+              f={this.state.curveFun}
+              animate={this.props.animate}
+              curveName={this.state.whichCurve}
+              sound={this.props.sound}
+            />
+            <OrbitControls />
         </Canvas>
       </div>
     );
